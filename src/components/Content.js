@@ -28,11 +28,14 @@ export default function Content() {
   const headerStyle = { fontWeight: 600, fontSize: 24 };
 
   return (
-    <Box sx={{ width: '100%', paddingTop: 10 }}>
-      <Box sx={{ width: '100%', background: '#efefef'}}>
+    <Box sx={{ width: "100%", paddingTop: 10 }}>
+      <Box sx={{ width: "100%", background: "#efefef" }}>
         <Container maxWidth="lg">
           <Box sx={{ pt: 1, pb: 0.5 }}>
-            <Typography sx={{ textAlign: "left", fontSize: 18 }} component="div">
+            <Typography
+              sx={{ textAlign: "left", fontSize: 18 }}
+              component="div"
+            >
               <p>
                 This tool implements models built on the{" "}
                 <Highlight>

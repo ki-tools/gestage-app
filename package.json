@@ -21,40 +21,12 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "lint": "yarn eslint --fix ./src && yarn prettier --write ./src",
-    "pretty": "yarn prettier --write ./src"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
       "react-app",
-      "react-app/jest",
-      "prettier"
-    ],
-    "rules": {
-      "react/prop-types": 0,
-      "no-param-reassign": 0,
-      "react/jsx-props-no-spreading": 0,
-      "no-console": 0,
-      "react/jsx-filename-extension": 0,
-      "no-unused-vars": 1,
-      "import/prefer-default-export": 0,
-      "jsx-a11y/click-events-have-key-events": 0,
-      "jsx-a11y/no-static-element-interactions": 0,
-      "react-hooks/exhaustive-deps": 0,
-      "prettier/prettier": [
-        "error",
-        {
-          "trailingComma": "es5",
-          "tabWidth": 2,
-          "semi": true,
-          "singleQuote": true,
-          "quoteProps": "as-needed"
-        }
-      ]
-    },
-    "plugins": [
-      "prettier"
+      "react-app/jest"
     ]
   },
   "browserslist": {
@@ -68,16 +40,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "eslint": "^8.38.0",
-    "eslint-config-airbnb": "^19.0.4",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-config-react-app": "^7.0.1",
-    "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-jsx-a11y": "^6.7.1",
-    "eslint-plugin-react": "^7.32.2",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "prettier": "^2.8.7"
   }
 }
