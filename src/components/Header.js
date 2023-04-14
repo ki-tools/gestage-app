@@ -60,7 +60,7 @@ export default function ElevateAppBar(props) {
               </Box>
               <Box sx={{ flexGrow: 1 }} />
               <Box sx={{ flexGrow: 0 }}>
-                <Link href="https://github.com" target="_blank" rel="noopener">
+                <Link href="https://github.com/ki-tools/gestage-app" target="_blank" rel="noopener">
                   <GitHubIcon fontSize="large" sx={{ color: "white" }} />
                 </Link>
               </Box>
