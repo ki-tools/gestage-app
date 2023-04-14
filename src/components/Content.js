@@ -190,7 +190,7 @@ function Inputs({
       pred = `${pred} days (${Math.round((pred / 7) * 100) / 100} weeks)`;
     }
     return pred;
-  }, [birthhc, birthwt, invalidBirthhc, invalidGagelmp, invalidBirthwt, mod]);
+  }, [birthhc, birthwt, gagelmp, invalidBirthhc, invalidGagelmp, invalidBirthwt, mod]);
 
   return (
     <Box sx={{ width: { xs: "100%", md: "unset" } }}>
