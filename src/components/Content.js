@@ -7,14 +7,18 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ToggleButton from "@mui/material/ToggleButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import Link from "@mui/material/Link";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import Lookups from "./Lookups";
+import dayjs from "dayjs";
+// import Lookups from "./Lookups";
 import getPred from "../models";
 
 export default function Content() {
   const [selectedMod, setSelectedMod] = useState("c");
   const [birthhc, setBirthhc] = useState(35);
+  const [lmpDate, setLmpDate] = useState(dayjs().subtract(40, "week"));
+  const [birthDate, setBirthDate] = useState(dayjs());
   const [gagelmp, setGagelmp] = useState(280);
   const [birthwt, setBirthwt] = useState(3500);
 
@@ -122,23 +126,25 @@ export default function Content() {
             </ToggleButtonGroup>
           </Box>
           <Typography sx={{ ...headerStyle, pt: 1, pb: 2 }}>
-            Get a single estimate
+            Get a single gestational age estimate
           </Typography>
           <Box sx={{ display: "flex", width: "100%" }}>
             <Inputs
               mod={selectedMod}
-              gagelmp={gagelmp}
-              setGagelmp={setGagelmp}
+              birthDate={birthDate}
+              setBirthDate={setBirthDate}
+              lmpDate={lmpDate}
+              setLmpDate={setLmpDate}
               birthhc={birthhc}
               setBirthhc={setBirthhc}
               birthwt={birthwt}
               setBirthwt={setBirthwt}
             />
           </Box>
-          <Typography sx={{ ...headerStyle, pt: 2.5, pb: 2 }}>
+          {/* <Typography sx={{ ...headerStyle, pt: 2.5, pb: 2 }}>
             Lookup tables
           </Typography>
-          <Lookups mod={selectedMod} />
+          <Lookups mod={selectedMod} /> */}
         </Box>
       </Container>
     </Box>
@@ -162,8 +168,10 @@ function Highlight({ children }) {
 function Inputs({
   mod,
   birthhc,
-  gagelmp,
-  setGagelmp,
+  lmpDate,
+  birthDate,
+  setLmpDate,
+  setBirthDate,
   setBirthhc,
   birthwt,
   setBirthwt,
@@ -174,100 +182,199 @@ function Inputs({
   function handleBirthwtChange(event) {
     setBirthwt(event.target.value);
   }
-  function handleGagelmpChange(event) {
-    setGagelmp(event.target.value);
+  function handleLmpDateChange(newValue) {
+    setLmpDate(newValue);
   }
+  function handleBirthDateChange(newValue) {
+    setBirthDate(newValue);
+  }
+  console.log(lmpDate);
   const invalidBirthhc = birthhc < 25 || birthhc > 40;
   const invalidBirthwt = birthwt < 1000 || birthwt > 5000;
-  const invalidGagelmp = gagelmp < 161 || gagelmp > 350;
+  const invalidLmpDate = lmpDate === null;
+  const invalidBirthDate = birthDate === null;
+  let invalidGagelmp = true;
+  let dateError = false;
+  let gagelmp = -1;
+  if (!invalidLmpDate && !invalidBirthDate) {
+    gagelmp = birthDate.diff(lmpDate, "day");
+    invalidGagelmp = gagelmp < 161 || gagelmp > 350;
+  }
+  const invalidGagelmp2 = !invalidLmpDate && !invalidLmpDate && invalidGagelmp;
+  let dateMsg = `${gagelmp} days between birth and last menstrual period`
+  if (invalidLmpDate && invalidBirthDate) {
+    dateMsg = "Enter a date for both LMP and birth";
+    dateError = true;
+  } else if (invalidLmpDate) {
+    dateMsg = "Enter a date for LMP";
+    dateError = true;
+  } else if (invalidBirthDate) {
+    dateMsg = "Enter a date for birth";    
+    dateError = true;
+  } else if (gagelmp > 350) {
+    dateMsg = `Too many days (${gagelmp}) between LMP and birth to estimage GA`
+    dateError = true;
+  } else if (gagelmp < 161) {
+    dateMsg = `Too few days (${gagelmp}) between LMP and birth to estimage GA`
+    dateError = true;
+  }
 
   const pred = useMemo(() => {
-    let pred = "";
+    let pred = -1;
     const validVal = mod === "c" ? !invalidGagelmp : !invalidBirthhc;
     if (validVal && !invalidBirthwt) {
       const val = Number(mod === "c" ? gagelmp : birthhc);
       pred = getPred(mod, val, birthwt, true);
-      pred = `${pred} days (${Math.round((pred / 7) * 100) / 100} weeks)`;
+      // pred = `${pred} days (${Math.round((pred / 7) * 100) / 100} weeks)`;
     }
     return pred;
-  }, [birthhc, birthwt, gagelmp, invalidBirthhc, invalidGagelmp, invalidBirthwt, mod]);
+  }, [
+    birthhc,
+    birthwt,
+    gagelmp,
+    invalidBirthhc,
+    invalidGagelmp,
+    invalidBirthwt,
+    mod,
+  ]);
+
+  let term = '';
+  if (pred > 0 && pred < 28 * 7) {
+    term = 'extremely preterm (less than 28 weeks)';
+  } else if (pred < 32 * 7) {
+    term = 'very preterm (28 to 32 weeks)'
+  } else if (pred < 37 * 7) {
+    term = 'moderate to late preterm (32 to 37 weeks)';
+  }
 
   return (
-    <Box sx={{ width: { xs: "100%", md: "unset" } }}>
-      {mod === "c" && (
-        <TextField
-          type="number"
-          error={invalidGagelmp}
-          id="gagelmp-input"
-          label="Gestational age LMP"
-          value={gagelmp}
-          helperText="Value between 161 and 350"
-          sx={{ width: { xs: "100%", md: "20ch" } }}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="start">days</InputAdornment>
-            ),
-          }}
-          onChange={handleGagelmpChange}
-        />
-      )}
-      {mod === "d" && (
-        <TextField
-          type="number"
-          error={invalidBirthhc}
-          id="birthhc-input"
-          label="Birth Head Circumference"
-          value={birthhc}
-          helperText="Value between 25 and 40"
-          sx={{ width: { xs: "100%", md: "20ch" } }}
-          InputProps={{
-            endAdornment: <InputAdornment position="start">cm</InputAdornment>,
-          }}
-          onChange={handleBirthhcChange}
-        />
-      )}
-      <BirthWeightInput
-        birthwt={birthwt}
-        invalidBirthwt={invalidBirthwt}
-        handleBirthwtChange={handleBirthwtChange}
-      />
-      <TextField
-        disabled
-        id="pred-output"
-        label="Gestational Age Estimate"
-        variant="outlined"
-        value={pred}
+    <Box>
+      <Box
         sx={{
-          ml: { md: 1 },
-          mt: { xs: 3, md: 0 },
-          width: { xs: "100%", md: "22ch" },
-          "& .Mui-disabled .MuiOutlinedInput-notchedOutline": {
-            borderColor: "#1976d2 !important",
-            backgroundColor: "rgba(25, 118, 210, 0.08)",
-          },
-          "& .Mui-disabled": {
-            color: "#1976d2",
-            WebkitTextFillColor: "#1976d2 !important",
+          width: {
+            xs: "100%",
+            md: "unset",
+            display: "flex",
+            flexDirection: "row",
           },
         }}
-      />
+      >
+        {mod === "c" && (
+          <Box style={{ display: "flex", flexDirection: "column" }}>
+            <Box style={{ display: "flex", flexDirection: "row" }}>
+              <DatePicker
+                label="Date of last menstrual period"
+                value={lmpDate}
+                slotProps={{
+                  textField: {
+                    error: invalidLmpDate || invalidGagelmp2,
+                  },
+                }}
+                format="YYYY/MM/DD"
+                onChange={handleLmpDateChange}
+                sx={{
+                  mt: { xs: 3, md: 0 },
+                  width: { xs: "50%", md: "21ch" },
+                }}
+              />
+              <DatePicker
+                label="Date of birth"
+                value={birthDate}
+                slotProps={{
+                  textField: {
+                    error: invalidBirthDate || invalidGagelmp2,
+                  },
+                }}
+                format="YYYY/MM/DD"
+                onChange={handleBirthDateChange}
+                sx={{
+                  boxSizing: "border-box",
+                  ml: 1,
+                  mt: { xs: 3, md: 0 },
+                  width: { xs: "50%", md: "21ch" },
+                }}
+              />
+            </Box>
+            <Box style={{
+              color: dateError ? '#d32f2f' : 'rgba(0, 0, 0, 0.6)',
+              fontWeight: 400,
+              fontSize: '0.75rem',
+              lineHeight: 1.66,
+              textAlign: 'left',
+              marginTop: 3,
+              marginRight: 14,
+              marginBottom: 0,
+              marginLeft: 14
+            }}>
+              {dateMsg}
+            </Box>
+          </Box>
+        )}
+        {mod === "d" && (
+          <TextField
+            type="number"
+            error={invalidBirthhc}
+            id="birthhc-input"
+            label="Birth head circumference"
+            value={birthhc}
+            helperText="Value between 25 and 40"
+            sx={{ width: { xs: "100%", md: "32ch" } }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="start">cm</InputAdornment>
+              ),
+            }}
+            onChange={handleBirthhcChange}
+          />
+        )}
+        <BirthWeightInput
+          birthwt={birthwt}
+          invalidBirthwt={invalidBirthwt}
+          handleBirthwtChange={handleBirthwtChange}
+          mod={mod}
+        />
+      </Box>
+      <Box>
+        <Box
+          style={{
+            width: "100%",
+            background: "rgb(25, 118, 210)",
+            opacity: pred > 0 ? 1 : 0.5,
+            padding: 20,
+            color: "white",
+            borderRadius: 15,
+            marginTop: 20,
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <Box style={{ fontSize: 14 }}>{/* asdf */}</Box>
+          <Box style={{ fontSize: 25, fontWeight: 500 }}>
+            <span style={{ fontSize: 22, opacity: 0.85 }}>
+              Gestational age (weeks+days):{" "}
+            </span>
+            {pred > 0 && `${Math.floor(pred / 7)}+${pred % 7}`}
+          </Box>
+          <Box>{term}</Box>
+        </Box>
+      </Box>
     </Box>
   );
 }
 
-function BirthWeightInput({ birthwt, invalidBirthwt, handleBirthwtChange }) {
+function BirthWeightInput({ birthwt, invalidBirthwt, handleBirthwtChange, mod }) {
   return (
     <TextField
       type="number"
       error={invalidBirthwt}
       id="birthwt-input"
-      label="Birth Weight"
+      label="Birth weight"
       value={birthwt}
       helperText="Value between 1,000 and 5,000"
       sx={{
         ml: { md: 1 },
         mt: { xs: 3, md: 0 },
-        width: { xs: "100%", md: "22ch" },
+        width: { xs: "100%", md: mod === "c" ? "22ch" : "33ch" },
       }}
       InputProps={{
         endAdornment: <InputAdornment position="start">g</InputAdornment>,

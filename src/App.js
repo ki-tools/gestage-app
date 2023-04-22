@@ -1,6 +1,8 @@
 import "./App.css";
 import { ThemeProvider, createTheme } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import Header from "./components/Header";
 import Content from "./components/Content";
 
@@ -14,9 +16,11 @@ function App() {
   return (
     <div className="App">
       <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Header />
-        <Content />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <CssBaseline />
+          <Header />
+          <Content />
+        </LocalizationProvider>
       </ThemeProvider>
     </div>
   );
