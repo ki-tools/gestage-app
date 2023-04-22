@@ -8,6 +8,7 @@ import ToggleButton from "@mui/material/ToggleButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import Link from "@mui/material/Link";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { PickersDay } from "@mui/x-date-pickers/PickersDay";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import dayjs from "dayjs";
@@ -19,7 +20,6 @@ export default function Content() {
   const [birthhc, setBirthhc] = useState(35);
   const [lmpDate, setLmpDate] = useState(dayjs().subtract(40, "week"));
   const [birthDate, setBirthDate] = useState(dayjs());
-  const [gagelmp, setGagelmp] = useState(280);
   const [birthwt, setBirthwt] = useState(3500);
 
   const theme = useTheme();
@@ -125,7 +125,7 @@ export default function Content() {
               </ToggleButton>
             </ToggleButtonGroup>
           </Box>
-          <Typography sx={{ ...headerStyle, pt: 1, pb: 2 }}>
+          <Typography sx={{ ...headerStyle, pt: 2, pb: 2.5 }}>
             Get a single gestational age estimate
           </Typography>
           <Box sx={{ display: "flex", width: "100%" }}>
@@ -165,6 +165,11 @@ function Highlight({ children }) {
   );
 }
 
+function MyDay(props) {
+  // return <PickersDay {...props} />;
+  return 'hi'
+}
+
 function Inputs({
   mod,
   birthhc,
@@ -188,11 +193,11 @@ function Inputs({
   function handleBirthDateChange(newValue) {
     setBirthDate(newValue);
   }
-  console.log(lmpDate);
+
   const invalidBirthhc = birthhc < 25 || birthhc > 40;
   const invalidBirthwt = birthwt < 1000 || birthwt > 5000;
-  const invalidLmpDate = lmpDate === null;
-  const invalidBirthDate = birthDate === null;
+  const invalidLmpDate = lmpDate === null || lmpDate.$d.toString() === "Invalid Date";
+  const invalidBirthDate = birthDate === null || birthDate.$d.toString() === "Invalid Date";
   let invalidGagelmp = true;
   let dateError = false;
   let gagelmp = -1;
@@ -201,21 +206,21 @@ function Inputs({
     invalidGagelmp = gagelmp < 161 || gagelmp > 350;
   }
   const invalidGagelmp2 = !invalidLmpDate && !invalidLmpDate && invalidGagelmp;
-  let dateMsg = `${gagelmp} days between birth and last menstrual period`
+  let dateMsg = `${gagelmp} days between birth and last menstrual period`;
   if (invalidLmpDate && invalidBirthDate) {
-    dateMsg = "Enter a date for both LMP and birth";
+    dateMsg = "Enter a valid date for both LMP and birth";
     dateError = true;
   } else if (invalidLmpDate) {
-    dateMsg = "Enter a date for LMP";
+    dateMsg = "Enter a valid date for LMP";
     dateError = true;
   } else if (invalidBirthDate) {
-    dateMsg = "Enter a date for birth";    
+    dateMsg = "Enter a valid date for birth";
     dateError = true;
   } else if (gagelmp > 350) {
-    dateMsg = `Too many days (${gagelmp}) between LMP and birth to estimage GA`
+    dateMsg = `Too many days (${gagelmp}) between LMP and birth to estimage GA`;
     dateError = true;
   } else if (gagelmp < 161) {
-    dateMsg = `Too few days (${gagelmp}) between LMP and birth to estimage GA`
+    dateMsg = `Too few days (${gagelmp}) between LMP and birth to estimage GA`;
     dateError = true;
   }
 
@@ -238,30 +243,30 @@ function Inputs({
     mod,
   ]);
 
-  let term = '';
+  let term = "";
   if (pred > 0 && pred < 28 * 7) {
-    term = 'extremely preterm (less than 28 weeks)';
+    term = "extremely preterm (less than 28 weeks)";
   } else if (pred < 32 * 7) {
-    term = 'very preterm (28 to 32 weeks)'
+    term = "very preterm (28 to 32 weeks)";
   } else if (pred < 37 * 7) {
-    term = 'moderate to late preterm (32 to 37 weeks)';
+    term = "moderate to late preterm (32 to 37 weeks)";
   }
 
   return (
-    <Box>
+    <Box sx={{ width: "100%" }}>
       <Box
         sx={{
           width: {
             xs: "100%",
             md: "unset",
-            display: "flex",
-            flexDirection: "row",
           },
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
         }}
       >
         {mod === "c" && (
-          <Box style={{ display: "flex", flexDirection: "column" }}>
-            <Box style={{ display: "flex", flexDirection: "row" }}>
+          <Box sx={{ display: "flex", flexDirection: "column" }}>
+            <Box sx={{ display: "flex", flexDirection: "row" }}>
               <DatePicker
                 label="Date of last menstrual period"
                 value={lmpDate}
@@ -270,7 +275,10 @@ function Inputs({
                     error: invalidLmpDate || invalidGagelmp2,
                   },
                 }}
-                format="YYYY/MM/DD"
+                slots={{
+                  Day: MyDay,
+                }}
+                format="YYYY-MM-DD"
                 onChange={handleLmpDateChange}
                 sx={{
                   mt: { xs: 3, md: 0 },
@@ -285,7 +293,7 @@ function Inputs({
                     error: invalidBirthDate || invalidGagelmp2,
                   },
                 }}
-                format="YYYY/MM/DD"
+                format="YYYY-MM-DD"
                 onChange={handleBirthDateChange}
                 sx={{
                   boxSizing: "border-box",
@@ -295,17 +303,19 @@ function Inputs({
                 }}
               />
             </Box>
-            <Box style={{
-              color: dateError ? '#d32f2f' : 'rgba(0, 0, 0, 0.6)',
-              fontWeight: 400,
-              fontSize: '0.75rem',
-              lineHeight: 1.66,
-              textAlign: 'left',
-              marginTop: 3,
-              marginRight: 14,
-              marginBottom: 0,
-              marginLeft: 14
-            }}>
+            <Box
+              style={{
+                color: dateError ? "#d32f2f" : "rgba(0, 0, 0, 0.6)",
+                fontWeight: 400,
+                fontSize: "0.75rem",
+                lineHeight: 1.66,
+                textAlign: "left",
+                marginTop: 3,
+                marginRight: 14,
+                marginBottom: 0,
+                marginLeft: 14,
+              }}
+            >
               {dateMsg}
             </Box>
           </Box>
@@ -334,16 +344,15 @@ function Inputs({
           mod={mod}
         />
       </Box>
-      <Box>
         <Box
-          style={{
-            width: "100%",
+          sx={{
+            width: { xs: "100%", md: "65.6ch" },
             background: "rgb(25, 118, 210)",
             opacity: pred > 0 ? 1 : 0.5,
-            padding: 20,
+            padding: 2,
             color: "white",
-            borderRadius: 15,
-            marginTop: 20,
+            borderRadius: 2,
+            mt: 3,
             display: "flex",
             flexDirection: "column",
           }}
@@ -357,12 +366,16 @@ function Inputs({
           </Box>
           <Box>{term}</Box>
         </Box>
-      </Box>
     </Box>
   );
 }
 
-function BirthWeightInput({ birthwt, invalidBirthwt, handleBirthwtChange, mod }) {
+function BirthWeightInput({
+  birthwt,
+  invalidBirthwt,
+  handleBirthwtChange,
+  mod,
+}) {
   return (
     <TextField
       type="number"
