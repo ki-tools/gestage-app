@@ -86,3 +86,55 @@ export default function getPred(mod, lookupVal, x, round) {
   }
   return res;
 }
+
+export function hc4wtRange(wt) {
+  let max = 40;
+  if (wt < 1680) {
+    max = 25 + 0.006 * wt;
+  }
+  return {
+    min: 25,
+    max: Math.round(10 * max) / 10
+  };
+}
+
+export function wt4hcRange(hc) {
+  let min = 1000;
+  if (hc > 35.2) {
+    min = 1680;
+  } else if (hc >= 30.8 && hc <= 35.2) {
+    min = -3760 + 154.5455 * hc;
+  }
+  return {
+    min: Math.round(min),
+    max: 5000
+  }
+};
+
+export function lmp4wtRange(wt) {
+  let max = 350;
+  if(wt <= 1550) {
+    max = 205 + 0.048 * wt;
+  } else if(wt > 1550 && wt < 1650) {
+    max = -30 + 0.23 * wt;
+  }
+  return {
+    min: 161,
+    max: Math.round(max)
+  };
+}
+
+export function wt4lmpRange(lmp) {
+  let min = 1000;
+  if (lmp > 254 && lmp <= 281) {
+    min = -4268.214 + 20.741 * lmp;
+  } else if (lmp <= 326 & lmp > 281) {
+    min = 1560;
+  } else if(lmp > 326) {
+    min = 307.7 + 3.846 * lmp;
+  }
+  return {
+    min: Math.round(min),
+    max: 5000
+  };
+}
