@@ -88,12 +88,12 @@ export default function getPred(mod, lookupVal, x, round) {
 }
 
 export function hc4wtRange(wt) {
-  let max = 40;
+  let max = 37;
   if (wt < 1680) {
     max = 25 + 0.006 * wt;
   }
   return {
-    min: 25,
+    min: 26,
     max: Math.round(10 * max) / 10
   };
 }

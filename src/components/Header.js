@@ -49,9 +49,9 @@ export default function ElevateAppBar(props) {
                 }}
               >
                 <Box sx={{ fontWeight: 400, fontSize: 26, lineHeight: "80px" }}>
-                  WHO AMHANI
+                  AMANHI
                   <span
-                    style={{ fontWeight: 600, fontSize: 22, paddingLeft: 15 }}
+                    style={{ fontWeight: 600, fontSize: 22, paddingLeft: 10 }}
                   >
                     Gestational Age Tool
                   </span>

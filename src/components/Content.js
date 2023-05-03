@@ -209,11 +209,11 @@ function Inputs({
       res.gagelmp = birthDate.diff(lmpDate, "day");
       res.invalidGagelmp = res.gagelmp < 161 || res.gagelmp > 350;
     }
-    res.invalidBirthhc = birthhc < 25 || birthhc > 40;
+    res.invalidBirthhc = birthhc < 26 || birthhc > 37;
     res.invalidBirthwt = birthwt < 1000 || birthwt > 5000;
     // but there are sometimes more restricted limits based on the other value
     res.wtLims = { min: 1000, max: 5000 };
-    res.hcLims = { min: 25, max: 40 };
+    res.hcLims = { min: 26, max: 37 };
     res.lmpLims = { min: 161, max: 350 };
     if (mod === "c") {
       if (!res.invalidBirthwt) {
